@@ -56,6 +56,19 @@ async function fetchVideos() {
     try {
         const res = await fetch('/data/videos.json');
         window.videosData = await res.json();
+        
+        // Normalize categories globally
+        window.videosData.forEach(v => {
+            if (v.category) {
+                const cats = Array.isArray(v.category) ? v.category : [v.category];
+                v.category = cats.map(c => {
+                    const trimmed = c.trim();
+                    if (!trimmed) return '';
+                    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+                }).filter(Boolean);
+            }
+        });
+        
         populateCategories();
         // Dispatch event when data is loaded
         document.dispatchEvent(new Event('videosLoaded'));
@@ -265,7 +278,7 @@ function createVideoCard(video) {
 
     card.innerHTML = `
         <div class="video-preview">
-            <img class="thumb" loading="lazy" alt="Video thumbnail">
+            <img class="thumb" loading="lazy" alt="Video thumbnail" src="${video.thumbnail || ''}">
             <div class="video-overlay"></div>
             ${durationHtml}
         </div>

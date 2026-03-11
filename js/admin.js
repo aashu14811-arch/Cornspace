@@ -30,7 +30,28 @@ document.getElementById('add-category-btn').addEventListener('click', () => {
     container.appendChild(input);
 });
 
-document.getElementById('generate-btn').addEventListener('click', () => {
+
+// Helper to parse odysee url
+function embedToLbryUrl(embedUrl) {
+    if (!embedUrl) return null;
+    try {
+        const path = embedUrl.split('/$/embed/')[1].split('?')[0];
+        return 'lbry://' + path.replace(/:/g, '#');
+    } catch(e) { return null; }
+}
+
+function formatDuration(seconds) {
+    if (!seconds) return '';
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = seconds % 60;
+    if (h > 0) {
+        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }
+    return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
+document.getElementById('generate-btn').addEventListener('click', async () => {
     const title = document.getElementById('v-title').value;
     const videoCode = document.getElementById('v-code').value;
     const embed = document.getElementById('v-embed').value;
@@ -41,11 +62,41 @@ document.getElementById('generate-btn').addEventListener('click', () => {
     const actorsStr = document.getElementById('v-actors').value;
     const desc = document.getElementById('v-desc').value;
     const credits = document.getElementById('v-credits').value;
-    const date = document.getElementById('v-date').value;
-    const duration = document.getElementById('v-duration').value;
+    let date = document.getElementById('v-date').value;
+    let duration = document.getElementById('v-duration').value;
 
     const actors = actorsStr.split(',').map(a => a.trim()).filter(a => a);
     const id = 'video' + Math.random().toString(36).substring(2, 9);
+    
+    let thumbnail = "";
+
+    // Auto-fetch metadata from Odysee
+    document.getElementById('generate-btn').textContent = "Fetching data...";
+    try {
+        const lbryUrl = embedToLbryUrl(embed);
+        if (lbryUrl) {
+            const res = await fetch('https://api.na-backend.odysee.com/api/v1/proxy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    method: 'resolve',
+                    params: { urls: [lbryUrl] }
+                })
+            });
+            const data = await res.json();
+            const meta = data.result[lbryUrl]?.value;
+            
+            if (meta) {
+                thumbnail = meta.thumbnail?.url || "";
+                if (!duration && meta.video?.duration) {
+                    duration = formatDuration(meta.video.duration);
+                }
+            }
+        }
+    } catch (err) {
+        console.error("Failed to fetch Odysee meta:", err);
+    }
+    document.getElementById('generate-btn').textContent = "Get JSON";
 
     const videoObj = {
         id,
@@ -57,7 +108,8 @@ document.getElementById('generate-btn').addEventListener('click', () => {
         description: desc,
         credits,
         publishDate: date,
-        duration: duration || "00:00"
+        duration: duration || "00:00",
+        thumbnail
     };
 
     document.getElementById('json-output').value = JSON.stringify(videoObj, null, 2);

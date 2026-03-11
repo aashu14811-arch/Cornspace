@@ -62,10 +62,8 @@ function renderHomeSections() {
     
     // Simple logic for sections
     const latest = [...videos].sort((a, b) => new Date(b.publishDate) - new Date(a.publishDate)).slice(0, 8);
-    const recommended = [...videos].sort(() => 0.5 - Math.random()).slice(0, 8);
 
     renderGrid('latest-grid', latest);
-    renderGrid('recommended-grid', recommended);
 }
 
 function renderGrid(containerId, videos) {
@@ -158,7 +156,11 @@ function renderWatchPage(videoId) {
 
     // Render related
     const related = window.videosData
-        .filter(v => v.id !== video.id)
+        .filter(v => {
+            if (v.id === video.id) return false;
+            const vCats = Array.isArray(v.category) ? v.category : [v.category];
+            return vCats.some(c => cats.includes(c));
+        })
         .sort((a, b) => {
             let scoreA = 0;
             let scoreB = 0;
@@ -166,11 +168,9 @@ function renderWatchPage(videoId) {
             const aCats = Array.isArray(a.category) ? a.category : [a.category];
             const bCats = Array.isArray(b.category) ? b.category : [b.category];
             
-            if (aCats.some(c => cats.includes(c))) scoreA += 2;
-            if (bCats.some(c => cats.includes(c))) scoreB += 2;
+            aCats.forEach(c => { if (cats.includes(c)) scoreA += 1; });
+            bCats.forEach(c => { if (cats.includes(c)) scoreB += 1; });
             
-            if (a.actors && video.actors) a.actors.forEach(act => { if (video.actors.includes(act)) scoreA += 1; });
-            if (b.actors && video.actors) b.actors.forEach(act => { if (video.actors.includes(act)) scoreB += 1; });
             return scoreB - scoreA;
         })
         .slice(0, 10);
