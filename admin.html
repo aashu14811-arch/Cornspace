@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Cornspace</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="/" class="logo">
+                <span style="color: #fff;">Corn</span><span style="color: var(--accent-color);">space</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <a href="/" class="icon-btn" style="font-size: 14px; padding: 8px 16px; border-radius: 20px; background: var(--accent-color); color: #000; font-weight: bold; text-decoration: none; width: auto; height: auto;">Go to Home</a>
+        </div>
+    </header>
+    <div class="admin-container">
+        <div id="login-section" class="admin-box">
+            <h2>Admin Login</h2>
+            <div class="form-group">
+                <input type="password" id="admin-password" placeholder="Enter Password">
+            </div>
+            <button id="login-btn">Login</button>
+            <p id="login-error" class="error hidden">Invalid password</p>
+        </div>
+
+        <div id="admin-panel" class="admin-box hidden">
+            <h2>Create Video Entry</h2>
+            <div class="form-group">
+                <label>Title</label>
+                <input type="text" id="v-title">
+            </div>
+            <div class="form-group">
+                <label>Video Code</label>
+                <input type="text" id="v-code" placeholder="e.g., VID-123">
+            </div>
+            <div class="form-group">
+                <label>Odysee Embed URL</label>
+                <input type="text" id="v-embed" placeholder="https://odysee.com/$/embed/...">
+            </div>
+            <div class="form-group">
+                <label>Categories</label>
+                <div id="category-inputs">
+                    <input type="text" class="v-category" placeholder="Category 1">
+                </div>
+                <button type="button" id="add-category-btn" style="margin-top: 8px; font-size: 12px; padding: 4px 8px; width: auto; background: #333; color: #fff;">+ Add Category</button>
+            </div>
+            <div class="form-group">
+                <label>Actors (comma separated)</label>
+                <input type="text" id="v-actors">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="v-desc"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Credits</label>
+                <input type="text" id="v-credits">
+            </div>
+            <div class="form-group">
+                <label>Publish Date</label>
+                <input type="date" id="v-date">
+            </div>
+            <div class="form-group">
+                <label>Duration (e.g., 12:34)</label>
+                <input type="text" id="v-duration" placeholder="00:00">
+            </div>
+            <button id="generate-btn">Get JSON</button>
+            
+            <textarea id="json-output" readonly placeholder="Generated JSON will appear here..."></textarea>
+        </div>
+    </div>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+{
+  "name": "Cornspace",
+  "description": "A fully static video sharing website powered by Rumble iframe embeds and a static JSON file.",
+  "requestFramePermissions": []
+}

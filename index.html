@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cornspace</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <button id="menu-btn" class="icon-btn" aria-label="Menu">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M21 6H3V5h18v1zm0 5H3v1h18v-1zm0 6H3v1h18v-1z"></path></svg>
+            </button>
+            <a href="/" class="logo">
+                <span style="color: #fff;">Corn</span><span style="color: var(--accent-color);">space</span>
+            </a>
+        </div>
+        <div class="header-center">
+            <div class="search-container">
+                <input type="text" id="search-input" placeholder="Search" autocomplete="off">
+                <button id="search-btn" aria-label="Search">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.7zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"></path></svg>
+                </button>
+                <div id="search-suggestions" class="suggestions-box hidden"></div>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="/admin.html" class="icon-btn" aria-label="Admin">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg>
+            </a>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div id="sidebar-overlay" class="sidebar-overlay"></div>
+        <aside class="sidebar" id="sidebar">
+            <nav>
+                <a href="/" class="nav-item active" data-nav="Home">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 4.44l7 6.09V20h-4v-6H9v6H5v-9.47l7-6.09m0-1.32l-8 6.96V21h6v-6h4v6h6V10.08l-8-6.96z"></path></svg>
+                    </div>
+                    <span>Home</span>
+                </a>
+                <div class="divider"></div>
+                <h3 class="nav-title">Categories</h3>
+                <div id="dynamic-categories"></div>
+            </nav>
+        </aside>
+
+        <main class="content" id="main-content">
+            <div id="category-chips" class="category-chips">
+                <!-- Chips will be populated here -->
+            </div>
+            <div id="home-sections">
+                <section class="video-section">
+                    <h2>Latest Uploads</h2>
+                    <div class="video-grid" id="latest-grid"></div>
+                </section>
+                <section class="video-section">
+                    <h2>Recommended</h2>
+                    <div class="video-grid" id="recommended-grid"></div>
+                </section>
+            </div>
+            <div id="search-results-section" class="hidden">
+                <h2 id="search-results-title">Search Results</h2>
+                <div class="video-grid" id="search-grid"></div>
+            </div>
+            <div id="watch-section" class="hidden watch-layout">
+                <div class="primary-column">
+                    <div class="player-container" id="player-container">
+                        <!-- iframe goes here -->
+                    </div>
+                    <div class="video-info">
+                        <h1 id="video-title">Loading...</h1>
+                        <div class="video-meta">
+                            <span id="video-date"></span> • <span id="video-category"></span><span id="video-code-display"></span>
+                        </div>
+                        <div class="video-description-box">
+                            <p id="video-description"></p>
+                            <p><strong>Actors:</strong> <span id="video-actors"></span></p>
+                            <p><strong>Credits:</strong> <span id="video-credits"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="secondary-column">
+                    <h3>Related Videos</h3>
+                    <div class="related-grid" id="related-grid"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/home.js"></script>
+</body>
+</html>
