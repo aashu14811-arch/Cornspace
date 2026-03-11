@@ -218,47 +218,6 @@ function performSearch(query) {
     document.dispatchEvent(event);
 }
 
-// Odysee API integration
-function embedToLbryUrl(embedUrl) {
-    const path = embedUrl.split('/$/embed/')[1].split('?')[0];
-    return 'lbry://' + path.replace(/:/g, '#');
-}
-
-async function getOdyseeMeta(embedUrl) {
-    const lbryUrl = embedToLbryUrl(embedUrl);
-    
-    const res = await fetch('https://api.na-backend.odysee.com/api/v1/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            method: 'resolve',
-            params: { urls: [lbryUrl] }
-        })
-    });
-    const data = await res.json();
-    const meta = data.result[lbryUrl].value;
-
-    if (!meta) {
-        throw new Error('Video not found or invalid response');
-    }
-
-    return {
-        thumbnail: meta.thumbnail?.url,
-        duration: meta.video?.duration,
-        title: meta.title
-    };
-}
-
-function formatDuration(seconds) {
-    if (!seconds) return '';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) {
-        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
 
 // Utility to create video card
 function createVideoCard(video) {
@@ -290,16 +249,10 @@ function createVideoCard(video) {
         </div>
     `;
 
-    // Inject Metadata
-    getOdyseeMeta(video.odyseeEmbed).then(meta => {
-        if (meta.thumbnail) card.querySelector('.thumb').src = meta.thumbnail;
-        if (meta.duration) card.querySelector('.duration').textContent = formatDuration(meta.duration);
-        // Do not update the title from metadata to keep the admin title
-    }).catch(err => {
-        console.error('Failed to fetch Odysee meta for', video.id, err);
-        // Fallback to a placeholder if thumbnail fails
+    // Set default if thumbnail is missing
+    if (!video.thumbnail) {
         card.querySelector('.thumb').src = 'https://picsum.photos/seed/' + video.id + '/640/360';
-    });
+    }
 
     return card;
 }

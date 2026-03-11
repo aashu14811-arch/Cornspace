@@ -31,30 +31,11 @@ document.getElementById('add-category-btn').addEventListener('click', () => {
 });
 
 
-// Helper to parse odysee url
-function embedToLbryUrl(embedUrl) {
-    if (!embedUrl) return null;
-    try {
-        const path = embedUrl.split('/$/embed/')[1].split('?')[0];
-        return 'lbry://' + path.replace(/:/g, '#');
-    } catch(e) { return null; }
-}
-
-function formatDuration(seconds) {
-    if (!seconds) return '';
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    if (h > 0) {
-        return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    }
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
 document.getElementById('generate-btn').addEventListener('click', async () => {
     const title = document.getElementById('v-title').value;
     const videoCode = document.getElementById('v-code').value;
     const embed = document.getElementById('v-embed').value;
+    const thumbnail = document.getElementById('v-thumbnail').value;
     
     const categoryInputs = document.querySelectorAll('.v-category');
     const categories = Array.from(categoryInputs).map(input => input.value.trim()).filter(c => c);
@@ -68,41 +49,11 @@ document.getElementById('generate-btn').addEventListener('click', async () => {
     const actors = actorsStr.split(',').map(a => a.trim()).filter(a => a);
     const id = 'video' + Math.random().toString(36).substring(2, 9);
     
-    let thumbnail = "";
-
-    // Auto-fetch metadata from Odysee
-    document.getElementById('generate-btn').textContent = "Fetching data...";
-    try {
-        const lbryUrl = embedToLbryUrl(embed);
-        if (lbryUrl) {
-            const res = await fetch('https://api.na-backend.odysee.com/api/v1/proxy', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    method: 'resolve',
-                    params: { urls: [lbryUrl] }
-                })
-            });
-            const data = await res.json();
-            const meta = data.result[lbryUrl]?.value;
-            
-            if (meta) {
-                thumbnail = meta.thumbnail?.url || "";
-                if (!duration && meta.video?.duration) {
-                    duration = formatDuration(meta.video.duration);
-                }
-            }
-        }
-    } catch (err) {
-        console.error("Failed to fetch Odysee meta:", err);
-    }
-    document.getElementById('generate-btn').textContent = "Get JSON";
-
     const videoObj = {
         id,
         videoCode,
         title,
-        odyseeEmbed: embed,
+        embedUrl: embed,
         category: categories,
         actors,
         description: desc,

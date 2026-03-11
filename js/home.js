@@ -117,25 +117,26 @@ function renderWatchPage(videoId) {
 
     // Render player with a facade to improve load time
     const playerContainer = document.getElementById('player-container');
+    const thumbSrc = video.thumbnail || `https://picsum.photos/seed/${video.id}/1280/720`;
+    
     playerContainer.innerHTML = `
         <div class="video-facade" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; border-radius: 12px; overflow: hidden;">
-            <img id="watch-thumb" loading="lazy" style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.7;" src="https://picsum.photos/seed/${video.id}/1280/720" alt="Thumbnail">
+            <img id="watch-thumb" loading="lazy" style="position: absolute; width: 100%; height: 100%; object-fit: cover; opacity: 0.7;" src="${thumbSrc}" alt="Thumbnail">
             <div class="play-button" style="position: relative; z-index: 10; width: 68px; height: 48px; background: rgba(255,0,0,0.8); border-radius: 12px; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,0,0,1)'" onmouseout="this.style.background='rgba(255,0,0,0.8)'">
                 <svg viewBox="0 0 24 24" width="32" height="32" fill="white"><path d="M8 5v14l11-7z"/></svg>
             </div>
         </div>
     `;
 
-    // Fetch real thumbnail for the facade
-    getOdyseeMeta(video.odyseeEmbed).then(meta => {
-        if (meta.thumbnail) document.getElementById('watch-thumb').src = meta.thumbnail;
-    }).catch(err => console.error('Failed to fetch Odysee meta for watch page', err));
-
     // Load iframe on click
     playerContainer.querySelector('.video-facade').addEventListener('click', () => {
-        const embedUrl = new URL(video.odyseeEmbed);
-        embedUrl.searchParams.set('autoplay', 'true');
-        playerContainer.innerHTML = `<iframe id="odysee-iframe" style="width:100%; aspect-ratio:16 / 9; border: none; border-radius: 12px;" src="${embedUrl.toString()}" allow="autoplay" allowfullscreen></iframe>`;
+        const embedUrlStr = video.embedUrl || video.odyseeEmbed;
+        const embedUrl = new URL(embedUrlStr);
+        // Add autoplay parameter. Voe usually supports ?autoplay=1 or ?a=1.
+        embedUrl.searchParams.set('autoplay', '1');
+        embedUrl.searchParams.set('a', '1');
+        
+        playerContainer.innerHTML = `<iframe id="video-iframe" style="width:100%; aspect-ratio:16 / 9; border: none; border-radius: 12px;" src="${embedUrl.toString()}" allow="autoplay" allowfullscreen></iframe>`;
     });
 
     // Render info
