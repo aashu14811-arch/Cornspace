@@ -115,6 +115,20 @@ function renderWatchPage(videoId) {
         return;
     }
 
+    // Preconnect to speed up iframe load
+    const embedUrlStrTmp = video.embedUrl || video.odyseeEmbed;
+    if (embedUrlStrTmp) {
+        try {
+            const origin = new URL(embedUrlStrTmp).origin;
+            if (!document.querySelector(`link[href="${origin}"]`)) {
+                let link = document.createElement('link');
+                link.rel = 'preconnect';
+                link.href = origin;
+                document.head.appendChild(link);
+            }
+        } catch(e) {}
+    }
+
     // Render player with a facade to improve load time
     const playerContainer = document.getElementById('player-container');
     const thumbSrc = video.thumbnail || `https://picsum.photos/seed/${video.id}/1280/720`;
@@ -136,7 +150,12 @@ function renderWatchPage(videoId) {
         embedUrl.searchParams.set('autoplay', '1');
         embedUrl.searchParams.set('a', '1');
         
-        playerContainer.innerHTML = `<iframe id="video-iframe" style="width:100%; aspect-ratio:16 / 9; border: none; border-radius: 12px;" src="${embedUrl.toString()}" allow="autoplay" allowfullscreen></iframe>`;
+        playerContainer.innerHTML = `
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #000; border-radius: 12px;">
+                <div class="loader"></div>
+            </div>
+            <iframe id="video-iframe" style="position: absolute; top: 0; left: 0; z-index: 10; width: 100%; height: 100%; border: none; border-radius: 12px; opacity: 0; transition: opacity 0.3s;" src="${embedUrl.toString()}" allow="autoplay" allowfullscreen onload="this.style.opacity=1;"></iframe>
+        `;
     });
 
     // Render info
